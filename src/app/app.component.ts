@@ -1,5 +1,6 @@
 import { Component, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
+import { AuthService } from './services/auth.service';
 
 @Component({
   selector: 'app-root',
@@ -8,5 +9,8 @@ import { BrowserModule } from '@angular/platform-browser';
 })
 
 export class AppComponent {
+
   title = 'webibook';
+
+  constructor(public auth: AuthService) { }
 }
