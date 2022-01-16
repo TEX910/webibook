@@ -1,3 +1,8 @@
-<button (click)='onGoogleLogin()'>
+<button (click)='onGoogleLogin()' *ngIf="!isLoggedIn">
   Login with Google
 </button>
+
+<button (click)='onGoogleLogout()' *ngIf="isLoggedIn">
+  Logout
+</button>
+
