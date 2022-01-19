@@ -1,8 +1,14 @@
-<button (click)='onGoogleLogin()' *ngIf="!isLoggedIn">
-  Login with Google
-</button>
+<ng-container>
+  Welcome to Webibook!
+  <button (click)='onGoogleLogin()' *ngIf="!isLoggedIn">
+    Login with Google
+  </button>
+</ng-container>
 
-<button (click)='onGoogleLogout()' *ngIf="isLoggedIn">
-  Logout
-</button>
+<ng-container>
+  <button (click)='onGoogleLogout()' *ngIf="isLoggedIn">
+    Logout
+  </button>
+</ng-container>
+
 
