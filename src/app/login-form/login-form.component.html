@@ -1,14 +1,31 @@
-<ng-container>
-  Welcome to Webibook!
-  <button (click)='onGoogleLogin()' *ngIf="!isLoggedIn">
-    Login with Google
-  </button>
+<ng-container *ngIf="!isLoggedIn">
+  <mat-grid-list cols="1" rowHeight="9em">
+    <mat-grid-tile>
+      <h1>
+        Welcome to Webibook!
+      </h1>
+    </mat-grid-tile>
+    <mat-grid-tile>
+      <mat-card>
+        <div style="text-align: center">
+          <mat-card-title>Login to use the service</mat-card-title>
+          <mat-card-actions>
+            <button (click)='onGoogleLogin()'>
+              Login with Google
+            </button>
+          </mat-card-actions>
+        </div>
+      </mat-card>
+    </mat-grid-tile>
+  </mat-grid-list>
 </ng-container>
 
+<div style="text-align: center">
 <ng-container>
   <button (click)='onGoogleLogout()' *ngIf="isLoggedIn">
     Logout
   </button>
 </ng-container>
+</div>
 
 
