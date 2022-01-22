@@ -1,16 +1,16 @@
 import {Injectable, OnInit} from '@angular/core';
 import {initializeApp} from 'firebase/app';
-import {getAuth, GoogleAuthProvider, signInWithPopup, signOut} from 'firebase/auth';
+import {getAuth, GoogleAuthProvider, signInWithPopup, signOut, setPersistence, inMemoryPersistence} from 'firebase/auth';
 import {addDoc, collection, getDocs, getFirestore, query, where, updateDoc, doc} from 'firebase/firestore'
 import {environment} from 'src/environments/environment';
-import {transition} from "@angular/animations";
 import {User} from "../models/user.model";
+import firebase from "firebase/compat";
 
 @Injectable({
   providedIn: 'root'
 })
 
-export class AuthService implements OnInit{
+export class AuthService{
 
   firebase = initializeApp(environment.firebaseConfig);
   googleProvider = new GoogleAuthProvider();
@@ -18,40 +18,44 @@ export class AuthService implements OnInit{
   db = getFirestore();
   isLogged = false;
   sessionToken = '';
+  userLogged: User = {
+    uid: '',
+    email: ''
+  };
 
   constructor(
   ) {
+    this.automaticLoginInitializeSession()
   }
-
-  ngOnInit() {
-  }
-
 
   // Sign in with Google
   public GoogleAuth() {
-    signInWithPopup(this.auth, this.googleProvider)
-    .then(async (result) => {
-      // This gives you a Google Access Token. You can use it to access the Google API.
-      const credential = GoogleAuthProvider.credentialFromResult(result);
-      if(credential?.accessToken) {
-        let userLogged: User = {
-          uid: result.user.uid,
-          email: <String>result.user.email,
-          photoURL: <String>result.user.photoURL,
-          displayName: <String>result.user.displayName
+    setPersistence(this.auth,inMemoryPersistence).then(() => {
+      signInWithPopup(this.auth, this.googleProvider)
+      .then(async (result) => {
+        // This gives you a Google Access Token. You can use it to access the Google API.
+        const credential = GoogleAuthProvider.credentialFromResult(result);
+        if(credential?.accessToken) {
+          let userLogged: User = {
+            uid: result.user.uid,
+            email: <String>result.user.email,
+            photoURL: <String>result.user.photoURL,
+            displayName: <String>result.user.displayName
+          }
+          await this.initializeSession(credential.accessToken, userLogged);
         }
-        await this.initializeSession(credential.accessToken, userLogged);
-      }
-    }).catch((error) => {
-      // Handle Errors here.
-      const errorCode = error.code;
-      const errorMessage = error.message;
-      // The email of the user's account used.
-      const email = error.email;
-      // The AuthCredential type that was used.
-      const credential = GoogleAuthProvider.credentialFromError(error);
-      // ...
+      }).catch((error) => {
+        // Handle Errors here.
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        // The email of the user's account used.
+        const email = error.email;
+        // The AuthCredential type that was used.
+        const credential = GoogleAuthProvider.credentialFromError(error);
+        // ...
+      });
     });
+
   }
 
   public async googleSignOut() {
@@ -59,6 +63,7 @@ export class AuthService implements OnInit{
     this.isLogged = false;
     console.log("User successfully logged out.");
     this.googleProvider.setCustomParameters({prompt: 'select_account'});
+    localStorage.removeItem('sessionToken');
   }
 
   public async initializeSession(accessToken: string, userLogged: User) {
@@ -66,10 +71,24 @@ export class AuthService implements OnInit{
     this.sessionToken = accessToken;
     //Setting up user logged variable
     this.isLogged = true;
+    //Storing the access token into the local storage
+    localStorage.setItem('sessionToken', accessToken);
+    localStorage.setItem('userLogged', JSON.stringify(userLogged));
+
 
     console.log('Succesfully logged in.');
 
     await this.setupFirestoreUserFile(userLogged);
+  }
+
+  automaticLoginInitializeSession(): void {
+    const sessionTokenStored = localStorage.getItem('sessionToken');
+    const userLoggedJSON = localStorage.getItem('userLogged');
+    if(sessionTokenStored && userLoggedJSON) {
+      this.sessionToken = sessionTokenStored;
+      this.userLogged = JSON.parse(userLoggedJSON);
+      this.isLogged = true;
+    }
   }
 
   private async setupFirestoreUserFile(userLogged: User) {
