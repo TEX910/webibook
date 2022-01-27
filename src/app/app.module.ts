@@ -10,10 +10,11 @@ import {MatCardModule} from "@angular/material/card";
 import { BookmarkTreeComponent } from './bookmark-tree/bookmark-tree.component';
 import {MatTreeModule} from "@angular/material/tree";
 import {MatIconModule} from "@angular/material/icon";
+import { DropzoneDirective } from './directives/dropzone.directive';
 
 
 @NgModule({
-  declarations: [AppComponent, LoginFormComponent, BookmarkTreeComponent],
+  declarations: [AppComponent, LoginFormComponent, BookmarkTreeComponent, DropzoneDirective],
   imports: [
     BrowserModule,
     AppRoutingModule,

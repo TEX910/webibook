@@ -13,7 +13,7 @@ export class BookmarkTreeComponent implements OnInit {
 
   treeController = new NestedTreeControl<BookElementModel>(node => node.children);
   dataSource = new MatTreeNestedDataSource<BookElementModel>();
-
+  files: File[] = [];
 
   constructor(
     public authService: AuthService
@@ -55,5 +55,15 @@ export class BookmarkTreeComponent implements OnInit {
   }
 
   hasChild = (_: number, node: BookElementModel) => !!node.children && node.children.length > 0;
+
+  onDrop(event: any) {
+    event.preventDefault();
+    console.log(event.dataTransfer.getData('Text'));
+  }
+
+  onDragOver(event: any) {
+    event.stopPropagation();
+    event.preventDefault();
+  }
 
 }
