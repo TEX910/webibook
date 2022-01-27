@@ -1,8 +1,12 @@
 <mat-tree [dataSource]="dataSource" [treeControl]="treeController" class="bookmark-tree">
-  <mat-tree-node *matTreeNodeDef="let node" matTreeNodeToggle>
+  <mat-tree-node *matTreeNodeDef="let node" matTreeNodeToggle dropzone
+                 (drop)="onDrop($event)"
+                 (dragover)="onDragOver($event)">
     <a [attr.href]="node.link" target="_blank">{{node.name}}</a>
   </mat-tree-node>
-  <mat-nested-tree-node *matTreeNodeDef="let node; when: hasChild">
+  <mat-nested-tree-node *matTreeNodeDef="let node; when: hasChild" dropzone
+                        (drop)="onDrop($event)"
+                        (dragover)="onDragOver($event)">
     <div class="mat-tree-node">
       <button mat-icon-button matTreeNodeToggle [attr.aria-label]="'Toggle ' + node.name">
         <mat-icon class="mat-icon-rtl-mirror">
@@ -18,22 +22,4 @@
 </mat-tree>
 
 
-<div class="dropzone"
-     dropzone
-     (drop)="onDrop($event)"
-     (dragover)="onDragOver($event)">
-     <!--(drop)="onDrop($event.dataTransfer.files)"-->
 
-
-
-  <h3>AngularFire Drop Zone</h3>
-  <p>Drag and Drop a File</p>
-</div>
-
-<h3>Uploads</h3>
-
-<div *ngFor="let file of files">
-  {{
-  file
-  }}
-</div>
