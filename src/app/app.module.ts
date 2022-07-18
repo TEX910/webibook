@@ -11,18 +11,29 @@ import { BookmarkTreeComponent } from './bookmark-tree/bookmark-tree.component';
 import {MatTreeModule} from "@angular/material/tree";
 import {MatIconModule} from "@angular/material/icon";
 import { DropzoneDirective } from './directives/dropzone.directive';
+import { LinkPositionSetterComponent } from './bookmark-tree/link-position-setter/link-position-setter.component';
+import {MatDialogModule} from "@angular/material/dialog";
+import {MatSelectModule} from "@angular/material/select";
+import {MatFormFieldModule} from "@angular/material/form-field";
+import {MatInputModule} from "@angular/material/input";
+import {FormsModule} from "@angular/forms";
 
 
 @NgModule({
-  declarations: [AppComponent, LoginFormComponent, BookmarkTreeComponent, DropzoneDirective],
+  declarations: [AppComponent, LoginFormComponent, BookmarkTreeComponent, DropzoneDirective, LinkPositionSetterComponent],
   imports: [
     BrowserModule,
     AppRoutingModule,
     BrowserAnimationsModule,
     MatGridListModule,
     MatCardModule,
+    MatDialogModule,
     MatTreeModule,
-    MatIconModule
+    MatIconModule,
+    MatSelectModule,
+    MatFormFieldModule,
+    MatInputModule,
+    FormsModule
   ],
   providers: [],
   bootstrap: [AppComponent]
