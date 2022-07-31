@@ -5,6 +5,7 @@ import {BookElementModel} from "../models/bookElement.model";
 import {MatTreeNestedDataSource} from "@angular/material/tree";
 import {MatDialog, MatDialogRef} from "@angular/material/dialog";
 import {LinkPositionSetterComponent} from "./link-position-setter/link-position-setter.component";
+import {BookmarkTreeService} from "./bookmark-tree.service";
 
 @Component({
   selector: 'app-bookmark-tree',
@@ -48,6 +49,7 @@ export class BookmarkTreeComponent implements OnInit {
 
   constructor(
     public authService: AuthService,
+    public bookmarkTreeService: BookmarkTreeService,
     public matDialogLinkPosition: MatDialog
   ) {
     this.dataSource.data = this.TREE_DATA;
@@ -74,17 +76,40 @@ export class BookmarkTreeComponent implements OnInit {
   private whenPathChosenSaveInTree(dialogLinkPositionRef: MatDialogRef<LinkPositionSetterComponent, any>, linkDragged: string) {
     dialogLinkPositionRef.afterClosed().subscribe(pathWhereToSave => {
       const stringPath: string = pathWhereToSave;
-      if (stringPath === "/") {
-        this.TREE_DATA.push({id: '99', name: linkDragged, link: linkDragged, isFolder: false});
-      } else {
-        // TODO: make a path fetching system to save in the correct path
-        this.TREE_DATA.splice(2, 0, {id: '99', name: linkDragged, link: linkDragged, isFolder: false});
-      }
-      console.log(this.TREE_DATA);
-      this.dataSource.data = this.TREE_DATA;
-      // TODO: dopo aver atteso il salvataggio fare questo aggiornamento oppure (MEGLIO) legare la variabile al contenuto del file relativo in firestore
-      // TODO: in quel caso non ci sarebbe bisongo di istruzioni di questo tipo
+      this.allocateLinkInCorrectPath(pathWhereToSave, linkDragged);
+      this.updateTree();
+      this.bookmarkTreeService.storeBookmarkTree(this.dataSource.data).subscribe(response => {
+        console.log(response);
+      });
     });
+  }
+
+  private updateTree() {
+    // @ts-ignore
+    this.dataSource.data = null; // necessario, bug di mat-tree
+    this.dataSource.data = this.TREE_DATA;
+  }
+
+  private allocateLinkInCorrectPath(path: String, link: String) {
+    const splitPath = path.split("/");
+    if (splitPath.length < 1) {
+      this.TREE_DATA.push({id: '99', name: link, link: link, isFolder: false});
+    }
+    let currentFolder = this.TREE_DATA;
+    let counterStep = 0;
+    for(const step of splitPath) {
+      counterStep++;
+      currentFolder = this.TREE_DATA.filter((e) => { return e.name === step });
+      if(currentFolder.length > 0) {
+        if (currentFolder[0].children && counterStep === splitPath.length) {
+          currentFolder[0].children.push({id: '99', name: link, link: link, isFolder: false});
+          return;
+        }
+      } else {
+        this.TREE_DATA.push({id: '99', name: step, isFolder: true});
+        return;
+      }
+    }
   }
 
   onDragOver(event: any) {
