@@ -92,8 +92,9 @@ export class BookmarkTreeComponent implements OnInit {
 
   private allocateLinkInCorrectPath(path: String, link: String) {
     const splitPath = path.split("/");
-    if (splitPath.length < 1) {
+    if (splitPath.length <= 1) {
       this.TREE_DATA.push({id: '99', name: link, link: link, isFolder: false});
+      return;
     }
     let currentFolder = this.TREE_DATA;
     let counterStep = 0;
